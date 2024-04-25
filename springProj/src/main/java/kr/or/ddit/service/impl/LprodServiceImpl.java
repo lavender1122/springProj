@@ -1,11 +1,14 @@
 package kr.or.ddit.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.or.ddit.dao.LprodDao;
 import kr.or.ddit.service.LprodService;
 import kr.or.ddit.vo.LprodVO;
+import lombok.extern.slf4j.Slf4j;
 //서비스 클래스 : 비즈니스 로직
 //스프링 MVC 구조에서 Controller와 DAO를 연결하는 역할
 /*
@@ -17,6 +20,7 @@ import kr.or.ddit.vo.LprodVO;
 Impl : implement의 약자 
 */
 //"프링아 이 클래스 서비스 클래야"라고 알려주자. 프링이가 자바빈으로 등록해줌.
+@Slf4j
 @Service
 public class LprodServiceImpl implements LprodService {
 	//데이터베이스 접근을 위해 BookDao 인스턴스를 주입받자
@@ -28,6 +32,17 @@ public class LprodServiceImpl implements LprodService {
 	@Override
 	public int createPost(LprodVO lprodVO) {
 		return this.lprodDao.createPost(lprodVO);
+	}
+
+	@Override
+	public List<LprodVO> list() {
+		log.info("impl->list");
+		return this.lprodDao.list();
+	}
+
+	@Override
+	public LprodVO detail(LprodVO lprodVO) {
+		return this.lprodDao.detail(lprodVO);
 	}
 
 }
