@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="projectAdd">
+	<insert id="createPost" parameterType="ProjectAddVO">
+	INSERT INTO project_add (
+    proj_nm,
+    proj_dstn,
+    stat,
+    clt_comp,
+    proj_ldr,
+    est_bgt,
+    tot_amt,
+    est_proj_don
+	) VALUES (#{projNm},#{projDstn},#{stat},#{cltComp},#{projLdr},#{estBgt},#{totAmt},#{estProjDon})
+	</insert>
+	
+</mapper>
