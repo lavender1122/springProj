@@ -1,5 +1,8 @@
 package kr.or.ddit.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,6 +16,21 @@ public class EmployeeDao {
 	
 	public int createPost(EmployeeVO employeeVO) {
 		return this.sqlSessionTemplate.insert("employee.createPost", employeeVO);
+	}
+
+	public List<EmployeeVO> list(Map<String, Object> map) {
+		return this.sqlSessionTemplate.selectList("employee.list",map);
+	}
+
+	public EmployeeVO detail(EmployeeVO employeeVO) {
+		return this.sqlSessionTemplate.selectOne("employee.detail", employeeVO);
+	}
+
+	public int updatePost(EmployeeVO employeeVO) {
+		return this.sqlSessionTemplate.update("employee.updatePost", employeeVO);
+	}
+	public int deletePost(EmployeeVO employeeVO) {
+		return this.sqlSessionTemplate.delete("employee.deletePost", employeeVO);
 	}
 
 }

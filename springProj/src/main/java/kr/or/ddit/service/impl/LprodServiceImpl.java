@@ -1,6 +1,7 @@
 package kr.or.ddit.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,14 +36,24 @@ public class LprodServiceImpl implements LprodService {
 	}
 
 	@Override
-	public List<LprodVO> list() {
+	public List<LprodVO> list(Map<String, Object> map) {
 		log.info("impl->list");
-		return this.lprodDao.list();
+		return this.lprodDao.list(map);
 	}
 
 	@Override
 	public LprodVO detail(LprodVO lprodVO) {
 		return this.lprodDao.detail(lprodVO);
+	}
+
+	@Override
+	public int updatePost(LprodVO lprodVO) {
+		return  this.lprodDao.updatePost(lprodVO);
+	}
+
+	@Override
+	public int deletePost(LprodVO lprodVO) {
+		return this.lprodDao.deletePost(lprodVO);
 	}
 
 }

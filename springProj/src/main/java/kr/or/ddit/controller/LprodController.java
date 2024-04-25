@@ -1,5 +1,6 @@
 package kr.or.ddit.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.or.ddit.service.LprodService;
@@ -58,10 +60,10 @@ public class LprodController {
    */
    @RequestMapping(value="/create", method=RequestMethod.POST)
    public ModelAndView createPost(LprodVO lprodVO) {
-      log.info("createPost->lprodVO : " + lprodVO);
+//      log.info("createPost->lprodVO : " + lprodVO);
       
       int result = this.lprodService.createPost(lprodVO);
-      log.info("createPost->result : " + result);
+//      log.info("createPost->result : " + result);
       
       ModelAndView mav = new ModelAndView();
       
@@ -76,13 +78,23 @@ public class LprodController {
    요청파라미터 : 
    요청방식 : get
    */
+   /*
+   요청URI : /lprod/list?keyword=알탄 or /list or /list?keyword=
+   요청파라미터 : keyword=알탄
+   요청방식 : get
+ */
    @RequestMapping(value="/list", method=RequestMethod.GET)
-   public ModelAndView list(ModelAndView mav) {
+   public ModelAndView list(ModelAndView mav,
+		   @RequestParam(value="keyword",required = false,defaultValue = "") String keyword) {
       log.info("list에 왔다");
+      log.info("list keyword ->"+keyword);
+      
+      Map<String, Object> map = new HashMap<String, Object>();
+      map.put("keyword",keyword);
       
       //Model(데이터)
       //상품분류 목록
-      List<LprodVO> lprodVOList = this.lprodService.list();
+      List<LprodVO> lprodVOList = this.lprodService.list(map);
       log.info("list->lprodVOList : " + lprodVOList);
       
       mav.addObject("lprodVOList", lprodVOList);
@@ -111,12 +123,39 @@ public class LprodController {
 	    // FROM     LPROD
 	     // WHERE  LPROD_GU = 'P101'
 	    // 을 처리한 후 다음이 콘솔에 출력되도록 해보자
-	      log.info("detail->lprodVO : " + lprodVO);
+//	      log.info("detail->lprodVO s: " + lprodVO);
 	   lprodVO = this.lprodService.detail(lprodVO);
-	   log.info("lprodVO>>"+lprodVO);
+//	   log.info("lprodVO>>"+lprodVO);
 	   mav.addObject("lprodVO", lprodVO);
 	   //forwarding : jsp
 	   mav.setViewName("lprod/detail");
+	   return mav;
+   }
+   /*
+   요청URI : /lprod/updatePost
+    요청파라미터 : {lprodId=9, lprodGu=P403, lprodNm=문구류2}
+    요청방식 : post
+    */
+   //파라미터 안에 있는 ModelAndView => 자동으로 객체 생성
+   @RequestMapping(value = "updatePost", method=RequestMethod.POST)
+   public ModelAndView updatePost(LprodVO lprodVO
+		   ,ModelAndView mav) {
+//	   log.info("updatePost -> lprodVO : "+lprodVO);
+	   //Model
+	   int result = this.lprodService.updatePost(lprodVO);
+	   log.info("update+result"+result);
+	   //View : redirect(새로운 URI 요청)
+	   mav.setViewName("redirect:/lprod/detail?lprodGu="+lprodVO.getLprodGu());
+	   
+	   return mav;
+   }
+   @RequestMapping(value = "deletePost",method=RequestMethod.POST)
+   public ModelAndView deletePost(LprodVO lprodVO
+		   ,ModelAndView mav) {
+	   log.info("deletePost ->"+lprodVO);
+	   int result= this.lprodService.deletePost(lprodVO);
+	   log.info("deletePost result"+result);
+	   mav.setViewName("redirect:/lprod/list");
 	   return mav;
    }
   

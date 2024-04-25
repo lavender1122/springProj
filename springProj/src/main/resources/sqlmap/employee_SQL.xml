@@ -11,4 +11,54 @@
     filename
 	) VALUES (#{empNo},#{empName},#{empAddress},#{empTelno},#{empSalary},#{filename})
 	</insert>
+	<select id="list" parameterType="employeeVO" resultType="employeeVO">
+		SELECT
+	    emp_no,
+	    emp_name,
+	    emp_address,
+	    emp_telno,
+	    emp_salary,
+	    filename
+	FROM
+	    employee
+	WHERE
+		1=1
+	    <if test ="keyword!=null and keyword!=''">
+	    and (emp_no    like '%'||#{keyword}||'%'
+	  or emp_name like '%'||#{keyword}||'%'
+	  or emp_address like '%'||#{keyword}||'%'
+	  or emp_telno like '%'||#{keyword}||'%'
+	  or filename    like '%'||#{keyword}||'%' )
+	    </if>
+	   ORDER BY emp_no
+	</select>
+	<select id="detail" parameterType="employeeVO" resultType="employeeVO">
+			SELECT
+		    emp_no,
+		    emp_name,
+		    emp_address,
+		    emp_telno,
+		    emp_salary,
+		    filename
+		FROM
+		    employee
+		where
+			emp_no=#{empNo}
+	</select>
+	<update id="updatePost" parameterType="employeeVO">
+		UPDATE employee
+	SET
+	     EMP_NAME= #{empName}
+	     , EMP_ADDRESS= #{empAddress}
+	     , EMP_TELNO=#{empTelno}
+	     , EMP_SALARY=#{empSalary}
+	     , FILENAME=#{filename}
+	WHERE
+	        emp_no =#{empNo}
+	</update>
+	<delete id="deletePost" parameterType="employeeVO">
+		DELETE FROM employee
+		WHERE
+		        emp_no =#{empNo}		
+	</delete>
 </mapper>

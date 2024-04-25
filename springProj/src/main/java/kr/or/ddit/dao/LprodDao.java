@@ -1,6 +1,7 @@
 package kr.or.ddit.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +33,22 @@ public class LprodDao {
 		return this.sqlSessionTemplate.insert("lprod.createPost", lprodVO);
 	}
 	
-	public List<LprodVO> list() {
+	public List<LprodVO> list(Map<String, Object> map) {
 		log.info("dao->list");
 		//.selectList("매퍼xml파일의 namvespace.id")
-		return this.sqlSessionTemplate.selectList("lprod.list");
+		return this.sqlSessionTemplate.selectList("lprod.list",map);
 	}
 
 	public LprodVO detail(LprodVO lprodVO) {
 		return this.sqlSessionTemplate.selectOne("lprod.detail", lprodVO);
+	}
+
+	public int updatePost(LprodVO lprodVO) {
+		return this.sqlSessionTemplate.update("lprod.updatePost", lprodVO);
+	}
+
+	public int deletePost(LprodVO lprodVO) {
+		return this.sqlSessionTemplate.delete("lprod.deletePost", lprodVO);
 	}
 
 }

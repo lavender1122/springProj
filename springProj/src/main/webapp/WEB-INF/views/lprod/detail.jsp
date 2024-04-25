@@ -23,6 +23,7 @@ $(function(){
 			//readonly(읽기 모드) 속성 제거
 			$(".formdata").removeAttr("readonly");
 			//action 속성의 값이/lprod/updatePost
+			 $("#frm").attr("action","/lprod/updatePost");
 	   });
 	   //취소버튼 클릭시!
 	   $("#cancel").on("click",function(){

@@ -8,9 +8,15 @@
       values(#{lprodId},#{lprodGu},#{lprodNm})
    </insert>
    
-   <select id="list" resultType="lprodVO">
+   <select id="list" parameterType="hashMap" resultType="lprodVO">
       SELECT LPROD_ID, LPROD_GU, LPROD_NM
       FROM LPROD
+      WHERE 1=1
+	 	<if test ="keyword!=null and keyword!=''" >
+			and (LPROD_ID    like '%'||#{keyword}||'%'
+	  		or LPROD_GU like '%'||#{keyword}||'%'
+	  		or LPROD_NM    like '%'||#{keyword}||'%' )
+		</if>
       ORDER BY LPROD_ID
    </select>
    <select id="detail" parameterType="lprodVO" resultType="lprodVO">
@@ -18,4 +24,17 @@
     FROM     LPROD
 	WHERE  LPROD_GU = #{lprodGu}
    </select>
+   <update id="updatePost" parameterType="lprodVO">
+   	UPDATE lprod
+	SET
+	    LPROD_ID= #{lprodId}
+	    , LPROD_NM= #{lprodNm}
+	WHERE
+	     lprod_gu = #{lprodGu}
+   </update>
+   <delete id="deletePost" parameterType="lprodVO">
+   DELETE FROM lprod
+	WHERE
+    lprod_gu = #{lprodGu}
+   </delete>
 </mapper>
