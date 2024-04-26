@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="customer">
+
+	<insert id="create" parameterType="customerVO">
+		INSERT INTO customer_bak (
+		    cst_no,
+		    cst_name,
+		    cst_address,
+		    cst_telno
+		) VALUES (
+		     #{cstNo},
+		     #{cstName},
+		     #{cstAddress},
+		     #{cstTelno}
+		)
+	</insert>
+	<select id="list" parameterType="hashMap" resultType="customerVO">
+		SELECT
+		    cst_no,
+		    cst_name,
+		    cst_address,
+		    cst_telno
+		FROM
+		    customer_bak
+		WHERE 1=1
+	 <if test ="keyword!=null and keyword!=''" >
+		and (cst_no    like '%'||#{keyword}||'%'
+	 	 or cst_name like '%'||#{keyword}||'%'
+	 	 or cst_address like '%'||#{keyword}||'%'
+	 	 or cst_telno    like '%'||#{keyword}||'%' )
+	</if>	
+	</select>
+	<select id="detail" parameterType="customerVO" resultType="customerVO">
+		SELECT
+		    cst_no,
+		    cst_name,
+		    cst_address,
+		    cst_telno
+		FROM
+		    customer_bak
+		WHERE
+		    cst_no=#{cstNo}
+	</select>
+	<update id="updatePost" parameterType="customerVO">
+		UPDATE customer_bak
+		SET
+		    CST_NAME =#{cstName}
+		    , CST_ADDRESS =#{cstAddress}
+		    , CST_TELNO =#{cstTelno}
+		WHERE
+		        cst_no = #{cstNo}
+	</update>
+	<delete id="deletePost" parameterType="customerVO">
+		DELETE FROM customer_bak
+		WHERE
+		        cst_no = #{cstNo}
+	</delete>
+</mapper>

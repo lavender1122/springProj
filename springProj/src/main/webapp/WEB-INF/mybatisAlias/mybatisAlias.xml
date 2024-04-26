@@ -17,6 +17,8 @@
    	<typeAlias type="kr.or.ddit.vo.EmployeeVO" alias="employeeVO"/>
    	<typeAlias type="kr.or.ddit.vo.LprodVO" alias="lprodVO"/>
    	<typeAlias type="kr.or.ddit.vo.ProjectAddVO" alias="ProjectAddVO"/>
+   	<typeAlias type="kr.or.ddit.vo.CustomerVO" alias="customerVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ContUsVO" alias="contUsVO"/>
    </typeAliases>
 </configuration>
 

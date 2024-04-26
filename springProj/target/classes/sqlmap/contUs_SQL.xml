@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="contUs">
+<!-- CU001 
+      전 : ContUsVO(cuCode=null, name=개똥이, email=test@test.com
+         , subject=제목글, message=<p>ㄴㅇㄻㄴㅇㄹㄴㄹㅇㄴㅇㄹㅇㄴㅁㄹㅇㄴㄻ</p>)
+      후 : ContUsVO(cuCode=CU001, name=개똥이, email=test@test.com
+         , subject=제목글, message=<p>ㄴㅇㄻㄴㅇㄹㄴㄹㅇㄴㅇㄹㅇㄴㅁㄹㅇㄴㄻ</p>)
+      -->
+	<insert id="createPost" parameterType="contUsVO">
+	<selectKey resultType="String" order="BEFORE" keyProperty="cuCode">
+	SELECT NVL(SUBSTR(MAX(CU_CODE),1,2)
+             || TRIM(TO_CHAR(SUBSTR(MAX(CU_CODE),3) + 1,'000')),'CU001')
+	FROM CONT_US
+	</selectKey>
+		INSERT INTO cont_us (
+		    cu_code,
+		    name,
+		    email,
+		    subject,
+		    message
+		) VALUES (
+		#{cuCode},#{name},#{email},#{subject},#{message}
+		)		
+	</insert>
+	<select id="list" parameterType="contUsVO" resultType="contUsVO">
+		SELECT
+		    cu_code,
+		    name,
+		    email,
+		    subject,
+		    message
+		FROM
+		    cont_us	
+	</select>
+</mapper>

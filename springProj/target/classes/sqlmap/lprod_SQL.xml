@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lprod">
+
+   <!-- LprodVO(lprodId=14, lprodGu=P501, lprodNm=분식류) -->
+   <insert id="createPost" parameterType="lprodVO">
+      insert into lprod(lprod_id,lprod_gu,lprod_nm)
+      values(#{lprodId},#{lprodGu},#{lprodNm})
+   </insert>
+   
+   <select id="list" parameterType="hashMap" resultType="lprodVO">
+      SELECT LPROD_ID, LPROD_GU, LPROD_NM
+      FROM LPROD
+      WHERE 1=1
+	 	<if test ="keyword!=null and keyword!=''" >
+			and (LPROD_ID    like '%'||#{keyword}||'%'
+	  		or LPROD_GU like '%'||#{keyword}||'%'
+	  		or LPROD_NM    like '%'||#{keyword}||'%' )
+		</if>
+      ORDER BY LPROD_ID
+   </select>
+   <select id="detail" parameterType="lprodVO" resultType="lprodVO">
+   	SELECT LPROD_ID, LPROD_GU, LPROD_NM
+    FROM     LPROD
+	WHERE  LPROD_GU = #{lprodGu}
+   </select>
+   <update id="updatePost" parameterType="lprodVO">
+   	UPDATE lprod
+	SET
+	    LPROD_ID= #{lprodId}
+	    , LPROD_NM= #{lprodNm}
+	WHERE
+	     lprod_gu = #{lprodGu}
+   </update>
+   <delete id="deletePost" parameterType="lprodVO">
+   DELETE FROM lprod
+	WHERE
+    lprod_gu = #{lprodGu}
+   </delete>
+</mapper>
