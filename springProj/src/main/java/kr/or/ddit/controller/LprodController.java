@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,19 +61,35 @@ public class LprodController {
    요청파라미터 : {lprodId=14, lprodGu=P501, lprodNm=분식류}
    요청방식 : post
    */
-   @RequestMapping(value="/create", method=RequestMethod.POST)
-   public ModelAndView createPost(LprodVO lprodVO) {
-//      log.info("createPost->lprodVO : " + lprodVO);
-      
-      int result = this.lprodService.createPost(lprodVO);
-//      log.info("createPost->result : " + result);
-      
-      ModelAndView mav = new ModelAndView();
-      
-      // redirect : 새로운 URI 요청
-      mav.setViewName("redirect:/lprod/create");
-      
-      return mav;
+//   @RequestMapping(value="/create", method=RequestMethod.POST)
+//   public ModelAndView createPost(LprodVO lprodVO) {
+////      log.info("createPost->lprodVO : " + lprodVO);
+//      
+//      int result = this.lprodService.createPost(lprodVO);
+////      log.info("createPost->result : " + result);
+//      
+//      ModelAndView mav = new ModelAndView();
+//      
+//      // redirect : 새로운 URI 요청
+//      mav.setViewName("redirect:/lprod/create");
+//      
+//      return mav;
+//   }
+   /* 
+	요청URI :/lprod/createAjax
+      요청파라미터(JSON->String : serialize) : {"lprodId": "14","lprodGu": "P501","lprodNm": "분식류"}
+      요청방식 : post
+    */
+   @RequestMapping(value="/createAjax", method=RequestMethod.POST)
+   public ResponseEntity<String> createAjax(@RequestBody LprodVO lprodVO) {
+      log.info("createAjax->lprodVO : " + lprodVO);
+	   
+	   int result = this.lprodService.createPost(lprodVO);
+       log.info("createPost->result : " + result);
+	   
+	   //HttpStatus.OK : HTTP 응답 상태 코드가 200(성공)
+	   ResponseEntity<String> entity = new ResponseEntity<String>("SUCCESS",HttpStatus.OK);
+	   return entity;
    }
    
    /*
@@ -137,26 +156,49 @@ public class LprodController {
     요청방식 : post
     */
    //파라미터 안에 있는 ModelAndView => 자동으로 객체 생성
-   @RequestMapping(value = "updatePost", method=RequestMethod.POST)
-   public ModelAndView updatePost(LprodVO lprodVO
-		   ,ModelAndView mav) {
-//	   log.info("updatePost -> lprodVO : "+lprodVO);
-	   //Model
+//   @RequestMapping(value = "updatePost", method=RequestMethod.POST)
+//   public ModelAndView updatePost(LprodVO lprodVO
+//		   ,ModelAndView mav) {
+////	   log.info("updatePost -> lprodVO : "+lprodVO);
+//	   //Model
+//	   int result = this.lprodService.updatePost(lprodVO);
+//	   log.info("update+result"+result);
+//	   //View : redirect(새로운 URI 요청)
+//	   mav.setViewName("redirect:/lprod/detail?lprodGu="+lprodVO.getLprodGu());
+//	   
+//	   return mav;
+//   }
+   /*
+   요청URI : /lprod/updateAjax
+    요청파라미터 : {lprodId: '14', lprodGu: 'P102', lprodNm: '전자제품'}
+    요청방식 : post
+    */
+   @RequestMapping(value = "updateAjax", method=RequestMethod.POST)
+   public ResponseEntity<LprodVO> updateAjax(@RequestBody LprodVO lprodVO) {
+	   log.info("updateAjax -> lprodVO : "+lprodVO);
 	   int result = this.lprodService.updatePost(lprodVO);
 	   log.info("update+result"+result);
-	   //View : redirect(새로운 URI 요청)
-	   mav.setViewName("redirect:/lprod/detail?lprodGu="+lprodVO.getLprodGu());
 	   
-	   return mav;
+	   ResponseEntity<LprodVO> entity
+	   	 =new ResponseEntity<LprodVO>(lprodVO, HttpStatus.OK);
+	   	 return entity;
    }
-   @RequestMapping(value = "deletePost",method=RequestMethod.POST)
-   public ModelAndView deletePost(LprodVO lprodVO
-		   ,ModelAndView mav) {
-	   log.info("deletePost ->"+lprodVO);
+//   @RequestMapping(value = "deletePost",method=RequestMethod.POST)
+//   public ModelAndView deletePost(LprodVO lprodVO
+//		   ,ModelAndView mav) {
+//	   log.info("deletePost ->"+lprodVO);
+//	   int result= this.lprodService.deletePost(lprodVO);
+//	   log.info("deletePost result"+result);
+//	   mav.setViewName("redirect:/lprod/list");
+//	   return mav;
+//   }
+   @RequestMapping(value = "deleteAjax",method=RequestMethod.POST)
+   public ResponseEntity<LprodVO> deleteAjax(@RequestBody LprodVO lprodVO) {
+	   log.info("deleteAjax ->"+lprodVO);
 	   int result= this.lprodService.deletePost(lprodVO);
 	   log.info("deletePost result"+result);
-	   mav.setViewName("redirect:/lprod/list");
-	   return mav;
+	   ResponseEntity<LprodVO> entity = new ResponseEntity<LprodVO>(lprodVO,HttpStatus.OK);
+	   return entity;
    }
   
 }

@@ -9,6 +9,64 @@
 	let lprodGu="${lprodVO.lprodGu}";
 	let lprodNm="${lprodVO.lprodNm}";
 $(function(){
+	//비동기 처리
+	$("#confirm").on("click",function(){
+		let lprodId = $("input[name='lprodId']").val();
+		let lprodGu = $("input[name='lprodGu']").val();
+		let lprodNm = $("input[name='lprodNm']").val();
+		
+		//JSON 오브젝트 타입
+		let data={
+				"lprodId":lprodId,
+				"lprodGu":lprodGu,
+				"lprodNm":lprodNm
+		};
+		//{lprodId: '14', lprodGu: 'P102', lprodNm: '전자제품'}
+		console.log("data:",data);
+		
+		$.ajax({
+			url:"/lprod/updateAjax",
+			contentType:"application/json;charset=utf-8",
+			data:JSON.stringify(data),
+			type:"post",
+			dataType:"json",
+			success:function(result){
+				//result :lprodVO
+				console.log("result",result);
+				if(result!=null){
+					location.href="/lprod/detail?lprodGu="+result.lprodGu;
+				}
+			}
+		})
+	});
+	  $("#delete").on("click",function(){
+			let lprodId = $("input[name='lprodId']").val();
+			let lprodGu = $("input[name='lprodGu']").val();
+			let lprodNm = $("input[name='lprodNm']").val();
+			//JSON 오브젝트 타입
+			let data={
+					"lprodId":lprodId,
+					"lprodGu":lprodGu,
+					"lprodNm":lprodNm
+			};
+			//{lprodId: '14', lprodGu: 'P102', lprodNm: '전자제품'}
+			console.log("data:",data);
+			$.ajax({
+				url:"/lprod/deleteAjax",
+				contentType:"application/json;charset=utf-8",
+				data:JSON.stringify(data),
+				type:"post",
+				dataType:"json",
+				success:function(result){
+					console.log("result",result);
+					if(result != null){
+						location.href="/lprod/list";
+					}
+				}
+			})
+	  });
+	
+	
 	   //일반모드와 수정모드를 toggle해보자
 	   //lprodGu는 계속 readonly상태
 	   //lprodId, lprodNm은 readonly toggle
@@ -76,7 +134,7 @@ $(function(){
    <!-- ///// 일반모드 끝 ///// -->
    <!-- ///// 수정모드 시작 ///// -->
    <p id="p2" style="display:none">
-      <input type="submit" id="confirm" value="확인" />
+      <input type="button" id="confirm" value="확인" />
       <input type="button" id="cancel" value="취소" />
    </p>
    <!-- ///// 수정모드 끝 ///// -->
