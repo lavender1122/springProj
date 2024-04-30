@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -253,7 +254,7 @@ public class BoardController {
       /*
       요청URI : /board/12
       요청파라미터 :(json타입의 텍스트): {boardNo=12,title=개똥이,content=개똥이짱,writer=김개똥}
-      			json 타입 쓸려면 @RequestBody TJdigka!
+      			json 타입 쓸려면 @RequestBody 써야함!
       요청방식 : put
       */
       @RequestMapping(value="/{boardNo}"

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.or.ddit.service.LprodService;
@@ -122,6 +123,32 @@ public class LprodController {
       mav.setViewName("lprod/list");
       
       return mav;
+   }
+   /*
+   요청URI : /lprod/listAjax
+   요청파라미터 :(JSON-Stirng):{"keyword":"P1"}
+   요청방식 : Post
+ */
+   //통신은 String으로 해야한다!
+   //@ResponseBody : List -> String(serialize) 
+   @ResponseBody
+   @RequestMapping(value="/listAjax", method=RequestMethod.POST)
+   public List<LprodVO> listAjax(@RequestBody Map<String,Object> map) {
+	   log.info("list에 왔다");
+	   log.info(""+map);
+	   
+//	   Map<String, Object> map = new HashMap<String, Object>(); //스프링에서 자동으로 해중
+//	   map.put("keyword","");
+	   
+	   //Model(데이터)
+	   //상품분류 목록
+	   List<LprodVO> lprodVOList = this.lprodService.list(map);
+	   log.info("list->lprodVOList : " + lprodVOList);
+	   
+	   //ResponseEntity 사용하지 않고 @ResponseBody 사용
+//	   ResponseEntity<List<LprodVO>> entity = new ResponseEntity<List<LprodVO>>(lprodVOList,HttpStatus.OK);
+	   
+	   return lprodVOList;
    }
    /*
    요청URI : /lprod/detail?lprodGu=P101

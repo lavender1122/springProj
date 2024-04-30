@@ -9,9 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.or.ddit.service.BookService;
@@ -77,6 +79,24 @@ public class BookController {
 		
 		return mav;
 	}
+	/* 
+	요청URI : /createAjax
+	요청파라미터(JSON->String) :
+	  {bookId:0,title:개똥이의 모험, category:소설, price:12000,insertDate=null||기본값}
+	요청방식 : post
+	
+	@ResponseBody : BookVO -> String 형태(serialize) why? 네트워크에서 네트워크 데이터 전송할려면 String 형태(serialize)이어야 한다
+	
+	 */
+	@ResponseBody
+	@RequestMapping(value="/createAjax",method=RequestMethod.POST)
+	public BookVO createAjax(@RequestBody BookVO bookVO) {
+		log.info("bookVO:"+bookVO);
+		//도서 등록
+		int result =this.bookService.createPost(bookVO);
+		log.info("createPost->result : "+result);
+		return bookVO;
+	}
 	/*
     요청URI : /list?keyword=알탄 or /list or /list?keyword=
     요청파라미터 : keyword=알탄
@@ -105,6 +125,21 @@ public class BookController {
 		//forwarding
 		mav.setViewName("book/list");
 		return mav;
+	}
+	/*
+    요청URI : /listAjax
+    요청파라미터 : {keyword:알탄} or {keyword:""}
+    요청방식 : post
+    */
+	@ResponseBody
+	@RequestMapping(value="/listAjax",method=RequestMethod.POST)
+	public List<BookVO> listAjax(@RequestBody Map<String, Object> map) {
+		
+//		도서목록
+		List<BookVO> bookVOList = this.bookService.list(map);
+		log.info("listAjax ->bookVOList >>>"+bookVOList);
+		
+		return bookVOList;
 	}
 	//책 상세보기
 	   //요청된 URI 주소 : http://localhost/detail?bookId=3
@@ -162,6 +197,23 @@ public class BookController {
 		mav.setViewName( "redirect:/detail?bookId="+bookVO.getBookId());
 		return mav;
 	}
+	/* 
+	요청URI : /updateAjax
+	요청파라미터 (JSON -> String): {bookId=127, title=개똥이의 모험2, category=소설2, price=12002}
+	요청방식 : post
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/updateAjax", method = RequestMethod.POST)
+	public BookVO updateAjax(@RequestBody BookVO bookVO){
+		log.info("updatePost-> bookVO:"+bookVO);
+		int result =this.bookService.updatePost(bookVO);
+		log.info("updatePost ->result"+result);
+		
+		//상세보기
+		bookVO = this.bookService.detail(bookVO);
+		
+		return bookVO;
+	}
 	/*
 	요청URI : /deletePost
 	요청파라미터 : {bookId=127, title=개똥이의 모험2, category=소설2, price=12002}
@@ -176,5 +228,20 @@ public class BookController {
 		//redirect -> list로 보냄
 		mav.setViewName("redirect:/list");
 		return mav;
+	}
+	/*
+	요청URI : /deleteAjax
+	요청파라미터 : {bookId=127, title=개똥이의 모험2, category=소설2, price=12002}
+	요청방식 : post
+	 */
+	@ResponseBody
+	@RequestMapping(value="/deleteAjax",method = RequestMethod.POST)
+	public int deleteAjax(@RequestBody BookVO bookVO) {
+//		BookVO(bookId=131, title=test, category=test, price=1234, insertDate=null)
+		log.info("deletePost->bookVO "+bookVO);
+		int result =this.bookService.deletePost(bookVO);
+		log.info("deletePost ->result"+result);
+		//redirect -> list로 보냄
+		return result;
 	}
 }

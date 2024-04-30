@@ -32,7 +32,6 @@ $(function(){
       요청방식 : get
       -->
    <form>
-   
       <input type="text" id="keyword" name="keyword" value="" placeholder="검색어를 입력하세요">
       <button type="button" id="btnSearch">검색</button><br>
    </form>

@@ -11,6 +11,39 @@
 	let category = "${bookVO.category}";
 	let price ="${bookVO.price}"
 $(function(){
+	$("#confirm").on("click",function(){
+		let empNo=$("input[name='empNo']").val();
+		let empName=$("input[name='empName']").val();
+		let empAddress=$("input[name='empAddress']").val();
+		let empTelno=$("input[name='empTelno']").val();
+		let empSalary=$("input[name='empSalary']").val();
+		let filename=$("input[name='filename']").val();
+		
+		let data={
+				"empNo":empNo,
+				"empName":empName,
+				"empAddress":empAddress,
+				"empTelno":empTelno,
+				"empSalary":empSalary,
+				"filename":filename
+		}
+		console.log(data);
+		
+		$.ajax({
+			url:"/employee/updateAjax",
+			contentType : "application/json;charset=utf-8",
+			 data : JSON.stringify(data),
+			 type:"post",
+			 dataType:"json",
+			 success:function(result){
+			 	console.log("result : " , result);
+	    		$("#p1").css("display","block");
+	    		$("#p2").css("display","none");
+	    			//readonly 속성 추가
+	    		$(".formdata").attr("readonly",true);
+			 }
+		});
+	});
 	$("#list").on("click",function(){
 		location.href="list";
 	});
@@ -45,11 +78,25 @@ $(function(){
 		console.log("result:"+result);
 		
 		if(result > 0){ // true ==1
-			$("#frm").submit();
+// 			$("#frm").submit();
 		}else{
 			alert("삭제가 취소되었습니다.");
 		}
 	});
+	$("#delete").on("click",function(){
+		let empNo=$("input[name='empNo']").val();
+		let data={
+				"empNo":empNo
+		};
+		console.log(data);
+		$.ajax({
+			url:"",
+			contentType : "application/json;charset=utf-8",
+			data:JSON.stringify(data),
+			type:"post",
+			dataType:
+		})
+	})
 });
 </script>
 <meta charset="UTF-8">
@@ -58,34 +105,36 @@ $(function(){
 <body>
 <%-- <p>${bookVO} --%>
 <h1>회원상세</h1>
- <h5>${employeeVO}</h5> 
-<form id="frm" name="frm" action="/employee/updatePost" method="post">
-	<!-- 폼데이터 -->
-	직원번호 : <input type="text" name="empNo" value="${employeeVO.empNo}" 
-		     readonly placeholder="직원번호"> <br>
-	이름 : <input type="text" name="empName" value="${employeeVO.empName}" 
-	           class="formdata" readonly placeholder="이름"><br>
-	주소 : <input type="text" name="empAddress" value="${employeeVO.empAddress}" 
-	         class="formdata" readonly placeholder="주소"><br>
-	연락처 : <input type="text" name="empTelno" value="${employeeVO.empTelno}" 
-	         class="formdata" readonly placeholder="연락처"><br>
-	급여 : <input type="number" name="empSalary" value="${employeeVO.empSalary}" 
-	         class="formdata" readonly placeholder="급여"><br>
-	증명사진 : <input type="text" name="filename" value="${employeeVO.filename}" 
-	         class="formdata" readonly placeholder="증명사진"><br>
-	<!-- 일반 모드 시작 -->
-	<p id="p1"> 
-		<input type="button" id="edit" value="수정">
-		<input type="button" id="delete" value="삭제">
-		<input type="button" id="list" value="목록">
-	</p>
-	<!-- 일반 모드 끝 -->
-	<!-- 수정 모드 시작 -->
-	<p id="p2" style ="display:none"> 
-		<input type="submit" id="confirm" value="확인">
-		<input type="button" id="cancel" value="취소">
-	</p>
-	<!-- 수정 모드 끝 -->
-</form>
+<%--  <h5>${employeeVO}</h5>  --%>
+ <div id="divForm">
+	<form id="frm" name="frm" action="/employee/updatePost" method="post">
+		<!-- 폼데이터 -->
+		직원번호 : <input type="text" name="empNo" value="${employeeVO.empNo}" 
+			      readonly placeholder="직원번호"> <br>
+		이름 : <input type="text" name="empName" value="${employeeVO.empName}" 
+		           class="formdata" readonly placeholder="이름"><br>
+		주소 : <input type="text" name="empAddress" value="${employeeVO.empAddress}" 
+		         class="formdata" readonly placeholder="주소"><br>
+		연락처 : <input type="text" name="empTelno" value="${employeeVO.empTelno}" 
+		         class="formdata" readonly placeholder="연락처"><br>
+		급여 : <input type="number" name="empSalary" value="${employeeVO.empSalary}" 
+		         class="formdata" readonly placeholder="급여"><br>
+		증명사진 : <input type="text" name="filename" value="${employeeVO.filename}" 
+		         class="formdata" readonly placeholder="증명사진"><br>
+		<!-- 일반 모드 시작 -->
+		<p id="p1"> 
+			<input type="button" id="edit" value="수정">
+			<input type="button" id="delete" value="삭제">
+			<input type="button" id="list" value="목록">
+		</p>
+		<!-- 일반 모드 끝 -->
+		<!-- 수정 모드 시작 -->
+		<p id="p2" style ="display:none"> 
+			<input type="button" id="confirm" value="확인">
+			<input type="button" id="cancel" value="취소">
+		</p>
+		<!-- 수정 모드 끝 -->
+	</form>
+</div>
 </body>
 </html>

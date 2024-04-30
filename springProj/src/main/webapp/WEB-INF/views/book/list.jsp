@@ -17,10 +17,53 @@ $(function(){
 		};
 		console.log("data:",data)
 		//this => 내가 바로 클릭한것
-		$(this).parent().submit();
-		
+// 		$(this).parent().submit();
+		getList(keyword);
 	});
+	
+	$("#btnSearchAll").on("click",function(){
+		getList("");
+	});
+	
+	//목록 함수 호출
+	getList("");
 });
+//목록
+function getList(keyword){
+	//json오브젝트
+	let data= {
+			"keyword":keyword
+	}
+	
+	//data:{"keyword":""}
+	//아작나써유.. (피)씨다터써..
+	$.ajax({
+		url:"/listAjax",
+		contentType:"application/json;charset=utf-8",
+		//요청영역
+		data:JSON.stringify(data),
+		type:"post",
+		//응답영역
+		dataType:"json",
+		success:function(result){
+			//result:List<BookVO>		
+			console.log("result",result);
+			
+			let str="";
+			
+			$.each(result,function(idx,bookVO){
+			str +="<tr>";
+			str +="<td>"+(idx+1)+"</td>";
+			str +="<td><a href='/detail?bookId="+bookVO.bookId+"'>"+bookVO.title+"</a></td>";
+			str +="<td>"+bookVO.category+"</td>";
+			str +="<td>"+bookVO.price+"원</td>";
+			str +="</tr>";
+			});
+			$("#trShow").html(str);
+		}
+	})
+}
+
 </script>
 </head>
 <body>
@@ -38,6 +81,7 @@ $(function(){
 		<input type="text" name="keyword" value="" placeholder="검색어 입력하세요">
 		<!-- submit /button/ reset -->
 		<button type="button" id="btnSearch">검색</button>
+		<button type="button" id="btnSearchAll">전체보기</button>
 	</form>
 	<a href="/create">도서등록</a>
 </p>
@@ -48,7 +92,7 @@ $(function(){
 			<th>번호</th><th>제목</th><th>카테고리</th><th>가격</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody id="trShow">
 	<!-- 
       forEach 태그? 배열(String[], int[][]), Collection(List, Set) 또는 
       Map(HashTable, HashMap, SortedMap)에 저장되어 있는 값들을 
@@ -63,14 +107,14 @@ $(function(){
        <!-- bookVOList => List<BookVO> -->
        <!-- row : bookVO 1행 -->
        <!--  -->
-       <c:forEach var="bookVO" items="${bookVOList}"  varStatus="stat">
-		<tr>
-			<td>${stat.count}</td>
-			<td><a href="/detail?bookId=${bookVO.bookId}"> ${bookVO.title}</a></td>
-			<td>${bookVO.category}</td>
-			<td><fmt:formatNumber value="${bookVO.price}" pattern="#,###"/>
-		</tr>
-       </c:forEach>
+<%--        <c:forEach var="bookVO" items="${bookVOList}"  varStatus="stat"> --%>
+<!-- 		<tr> -->
+<%-- 			<td>${stat.count}</td> --%>
+<%-- 			<td><a href="/detail?bookId=${bookVO.bookId}"> ${bookVO.title}</a></td> --%>
+<%-- 			<td>${bookVO.category}</td> --%>
+<%-- 			<td><fmt:formatNumber value="${bookVO.price}" pattern="#,###"/> --%>
+<!-- 		</tr> -->
+<%--        </c:forEach> --%>
 	</tbody>
 </table>
 </body>

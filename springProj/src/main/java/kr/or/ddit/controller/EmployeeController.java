@@ -7,9 +7,11 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.or.ddit.service.EmployeeService;
@@ -46,7 +48,7 @@ public class EmployeeController {
 		//jsp 경로
 		//뷰리졸버
 		// /WEB-INF/views/+employee/create+.jsp
-		mav.setViewName("/employee/create");
+		mav.setViewName("employee/create");
 		return mav;
 	}
 	/*
@@ -73,10 +75,21 @@ public class EmployeeController {
 		int result = this.employeeService.createPost(employeeVO);
 		log.info("createPost.result>>"+result);
 		
-		mav.setViewName("redirect:/employee/create");
+		mav.setViewName("redirect:employee/create");
 		
 		return mav;
 	}
+	@ResponseBody
+	@RequestMapping(value = "/createAjax",method = RequestMethod.POST)
+	public int createAjax(@RequestBody EmployeeVO employeeVO) {
+		log.info("employeeVO>>"+employeeVO);
+		
+		int result = this.employeeService.createPost(employeeVO);
+		log.info("createPost.result>>"+result);
+		return result;
+		
+	}
+	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public ModelAndView list(ModelAndView mav
 			,@RequestParam(value = "keyword",required = false,defaultValue = "") String keyword) {
@@ -90,7 +103,7 @@ public class EmployeeController {
 		log.info("employeeVOList"+employeeVOList);
 		
 		mav.addObject("employeeVOList", employeeVOList);
-		mav.setViewName("/employee/list");
+		mav.setViewName("employee/list");
 		return mav;
 	}
 	@RequestMapping(value = "/detail",method = RequestMethod.GET)
@@ -99,7 +112,7 @@ public class EmployeeController {
 		log.info("employeeVO"+employeeVO);
 		
 		mav.addObject("employeeVO", employeeVO);
-		mav.setViewName("/employee/detail");
+		mav.setViewName("employee/detail");
 		return mav;
 	}
 	@RequestMapping(value="updatePost",method=RequestMethod.POST)
@@ -107,15 +120,25 @@ public class EmployeeController {
 		log.info("update");
 		int result =this.employeeService.updatePost(employeeVO);
 		log.info("update ->result"+result);
-		mav.setViewName("redirect:/employee/detail?empNo="+employeeVO.getEmpNo());
+		mav.setViewName("redirect:employee/detail?empNo="+employeeVO.getEmpNo());
 		return mav;
+	}
+	@ResponseBody
+	@RequestMapping(value="updateAjax",method=RequestMethod.POST)
+	public EmployeeVO updateAjax(@RequestBody EmployeeVO employeeVO) {
+		log.info("update");
+		int result =this.employeeService.updatePost(employeeVO);
+		log.info("update ->result"+result);
+		employeeVO = this.employeeService.detail(employeeVO);
+		
+		return employeeVO;
 	}
 	@RequestMapping(value="deletePost",method=RequestMethod.POST)
 	public ModelAndView deletePost(EmployeeVO employeeVO, ModelAndView mav) {
 		log.info("deletePost");
 		int result =this.employeeService.deletePost(employeeVO);
 		log.info("update ->result"+result);
-		mav.setViewName("redirect:/employee/list");
+		mav.setViewName("redirect:employee/list");
 		return mav;
 	}
 }

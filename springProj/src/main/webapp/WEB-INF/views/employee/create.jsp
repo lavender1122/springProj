@@ -3,8 +3,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+<script type="text/javascript" src="/resources/js/jquery.min.js"></script>
 <title>Employee</title>
+<script type="text/javascript">
+$(function(){
+	$("#btnSubmit").on("click",function(){
+		let empNo =$("input[name='empNo']").val();
+		let empName =$("input[name='empName']").val();
+		let empAddress =$("input[name='empAddress']").val();
+		let empTelno =$("input[name='empTelno']").val();
+		let filename =$("input[name='filename']").val();
+
+		let data={
+				"empNo":empNo,
+				"empName":empName,
+				"empAddress":empAddress,
+				"empTelno":empTelno,
+				"filename":filename
+		}
+		$.ajax({
+			url:"/employee/createAjax",
+			contentType:"application/json;charset=utf-8",
+			data:JSON.stringify(data),
+			type:"post",
+			dataType:"json",
+			success:function(result){
+			console.log("result",result);
+			location.href="employee/list"
+			}
+		})
+		
+	});
+})
+</script>
 </head>
 <body>
 <h1>직원등록</h1>
@@ -18,14 +49,14 @@
 	   return 타입 : ModelAndView
 	   model.setViewName("redirect:/employee/create");
 	 -->
-<form action="/employee/create" method="post">
+<form id=frm action="/employee/create" method="post">
 	<p><input type="text" name="empNo" required placeholder="직원 번호 (ex.A011)"></p>
 	<p><input type="text" name="empName" required placeholder="직원 명 (ex.개똥이)"></p>
 	<p><input type="text" name="empAddress" required placeholder="직원 주소(ex.세종시 새롬중앙로 11)"></p>
 	<p><input type="text" name="empTelno" required placeholder="직원 연락처(ex.010-5656-2222)"></p>
 	<p><input type="number" name="empSalary" required placeholder="직원 급여(ex. 5000000)"></p>
 	<p><input type="text" name="filename"  placeholder="직원번호(ex.A011.jpg)"></p>
-	<input type="submit" value="등록">
+	<input type="button" id="btnSubmit" value="등록">
 </form>
 </body>
 </html>
