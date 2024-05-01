@@ -141,4 +141,12 @@ public class EmployeeController {
 		mav.setViewName("redirect:employee/list");
 		return mav;
 	}
+	@ResponseBody
+	@RequestMapping(value="deleteAjax",method=RequestMethod.POST)
+	public int deleteAjax(@RequestBody EmployeeVO employeeVO) {
+		
+		int result =this.employeeService.deletePost(employeeVO);
+		log.info("deleteAjax ->result"+result);
+		return result;
+	}
 }

@@ -123,6 +123,6 @@
 <!-- AdminLTE App -->
 <script src="/resources/adminlte/dist/js/adminlte.js"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="/resources/adminlte/dist/js/demo.js"></script>
+<!-- <script src="/resources/adminlte/dist/js/demo.js"></script> -->
 </body>
 </html>

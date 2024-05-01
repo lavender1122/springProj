@@ -90,11 +90,15 @@ $(function(){
 		};
 		console.log(data);
 		$.ajax({
-			url:"",
+			url:"/employee/deleteAjax",
 			contentType : "application/json;charset=utf-8",
 			data:JSON.stringify(data),
 			type:"post",
-			dataType:
+			dataType:"json",
+			success:function(result){
+				console.log("result",result);
+				location.href="/employee/list";
+			}
 		})
 	})
 });
