@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -139,6 +140,21 @@ $(function(){
 		</p>
 		<!-- 수정 모드 끝 -->
 	</form>
+<hr/>
+<h3>자경증정보</h3>
+<!-- mav.addObject("employeeVo", employeeVO) -->
+<p>${employeeVO}</p>
+<p>${employeeVO.licenseList}</p>
+<table border="1">
+	<tr>
+	 	<th>자격증번호</th><th>자격증명</th><th>취득일</th>
+	</tr>
+<c:forEach var="licenseVO" items="${employeeVO.licenseList}" varStatus="stat">
+	<tr>
+	 	<td>${licenseVO.licNo}</td><td>${licenseVO.licNm}</td><td>${licenseVO.licDt}</td>
+	</tr>
+</c:forEach>
+</table>
 </div>
 </body>
 </html>

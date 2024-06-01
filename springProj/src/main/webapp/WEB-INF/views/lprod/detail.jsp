@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,7 +36,7 @@
                   dataType : "json",
                   success : function(result) {
                      // result : lprodVO
-                     console.log("result : " + result);
+                     console.log("result : " , result);
 
                      if (result != null) {
                         location.href = "/lprod/detail?lprodGu="
@@ -198,6 +199,7 @@ function getList(keyword) {
    요청파라미터 : {lprodId=14,lprodGu=P501, lprodNm=분식류}
    요청방식 : post
  -->
+ <h3>상품분류정보</h3>
     <div id="divForm">
       <form id="frm" action="/lprod/updatePost" method="post">
          <p>
@@ -227,5 +229,25 @@ function getList(keyword) {
          <!-- ///// 수정모드 끝 ///// -->
       </form>
    </div>
+<h3>상품정보</h3>
+<!-- mav.addObject("lprodVO",lprodVO);  -->
+<p>${lprodVO.productVOList}</p>
+<table border="1">
+	<thead>
+		<tr>
+			<th>상품아이디</th><th>상품명</th><th>상품가격</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!-- lprodVO.productVOList : List<ProductVO> -->
+		<c:forEach var="productVO" items="${lprodVO.productVOList}" varStatus="stat">
+		<tr>
+			<td>${productVO.productId}</td>
+			<td>${productVO.pname}</td>
+			<td>${productVO.unitPrice}</td>
+		</tr>
+		</c:forEach>
+	</tbody>
+</table>
 </body>
 </html>

@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import kr.or.ddit.vo.BoardVO;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+
 //클래스 레벨 요청 경로 지정 
-@RequestMapping("/board")
+@RequestMapping(value="/board")
 @Slf4j
 @Controller
 public class BoardController {
@@ -29,15 +33,19 @@ public class BoardController {
        */
       
       /*
-       요청 URI : /baord/register
+       요청 URI : /board/register
        요청 파라미터:
        요청방식 : get
        */
+	  @PreAuthorize("hasRole('ROLE_MEMBER')")
       @RequestMapping(value="/register",method=RequestMethod.GET)
-      public void registerForm() {
+      public String registerForm() {
          log.info("registerForm에 왔다");
          //ModelAndView가 없음
-         //mav.setViewName("board//register") 생략 
+         //mav.setViewName("board//register") 생략
+         
+         //forwarding : jsp
+         return "board/register";
       }
       
       /* 
@@ -59,7 +67,7 @@ public class BoardController {
        요청 파라미터:
        요청방식 : get
        */
-      @RequestMapping("/modify")
+      @RequestMapping(value= "/modify", method = RequestMethod.GET)
       public String modifyForm() {
          log.info("modifyForm에 왔다");
          
@@ -148,9 +156,10 @@ public class BoardController {
       public String list() {
          log.info("list에 왔다");
          
-         //forwarding : /views/list.jsp
-         return "list";
+         //forwarding : /views/board/list.jsp
+         return "board/list";
       }
+      
       /*Params 매핑
       요청URI : /board/get?register
       params : register
@@ -162,7 +171,7 @@ public class BoardController {
       public String getRegister() {
          log.info("GetRegister에 왔다");
          
-         //forwardin
+         //forwarding
          return "board/register";
       }
       
@@ -177,7 +186,7 @@ public class BoardController {
       public String getModify() {
          log.info("getModify에 왔다");
          
-         //forwardin
+         //forwarding
          return "board/modify";
       }
       

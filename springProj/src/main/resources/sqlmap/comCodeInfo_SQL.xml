@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ComCodeInfoMapper">
+	<!-- 입력 뷰 -->
+	<select id="create" resultType="comCodeInfoVO">
+	SELECT COM_CODE, COM_CODE_NM, DESCRIPTIONS
+		FROM COM_CODE_INFO	
+	</select>
+	
+	<!-- 입력 실행 -->
+	<insert id="createPost" parameterType="comCodeInfoVO">
+	INSERT INTO COM_CODE_INFO (COM_CODE, COM_CODE_NM
+	<if test="descriptions!=null and descriptions !=''">
+	, DESCRIPTIONS
+	</if>
+	)
+	VALUES(#{comCode},#{comCodeNm}
+	<if test="descriptions!=null and descriptions !=''">
+	, #{descriptions}
+	</if>
+	)
+	</insert>
+	<!-- 상세 뷰 -->
+	<select id="detail" parameterType="comCodeInfoVO" resultType="comCodeInfoVO">
+		SELECT COM_CODE, COM_CODE_NM, DESCRIPTIONS
+		FROM COM_CODE_INFO
+		WHERE COM_CODE= #{comCode}
+	</select>
+	<!-- 수정 실행 -->
+	<update id="updatePost" parameterType="comCodeInfoVO">
+		UPDATE COM_CODE_INFO
+		SET
+		COM_CODE_NM = #{comCodeNm}
+		<if test="descriptions!=null and descriptions !=''">
+		, DESCRIPTIONS = #{descriptions}
+		</if>
+		WHERE
+		COM_CODE = #{comCode}	
+	</update>
+	
+	<delete id="deletePost" parameterType="comCodeInfoVO">
+		DELETE FROM COM_CODE_INFO
+		WHERE COM_CODE= #{comCode}	
+	</delete>
+	
+	<select id="list"  parameterType="hashMap" resultType="comCodeInfoVO">
+		SELECT COM_CODE, COM_CODE_NM, DESCRIPTIONS
+		FROM COM_CODE_INFO	
+	</select>
+</mapper>

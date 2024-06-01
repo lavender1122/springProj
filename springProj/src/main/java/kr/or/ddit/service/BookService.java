@@ -20,4 +20,7 @@ public interface BookService {
 	public int updatePost(BookVO bookVO);
 	//도서 삭제
 	public int deletePost(BookVO bookVO);
+
+	//도서 전체 행수
+	public int getTotal(Map<String, Object> map);
 }

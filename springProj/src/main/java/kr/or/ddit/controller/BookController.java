@@ -1,14 +1,19 @@
 package kr.or.ddit.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.or.ddit.service.BookService;
+import kr.or.ddit.utils.ArticlePage;
 import kr.or.ddit.vo.BookVO;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +44,10 @@ public class BookController {
 	//요청URI : /create
 	   //요청파라미터 : 
 	   //요청방식 : get
+	   // 로그인(인증) 한 관리자 또는 회원(인가)만 접근 가능
+//	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEMBER')")
+//	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MEMBER')")
+	@Secured({"ROLE_MEMBER","ROLE_ADMIN"})
 	@RequestMapping(value="/create",method=RequestMethod.GET)
 	public ModelAndView create() {
 		/*
@@ -71,7 +81,7 @@ public class BookController {
 		ModelAndView mav = new ModelAndView();
 		//도서 등록
 		int result =this.bookService.createPost(bookVO);
-//		log.info("createPost->result : "+result);
+		log.info("createPost->result : "+result);
 		//데이터
 		mav.addObject("bookVO", bookVO); //redirect 하면 의미 사라짐
 		//redirect : 새로운 URL 요청
@@ -88,6 +98,7 @@ public class BookController {
 	@ResponseBody : BookVO -> String 형태(serialize) why? 네트워크에서 네트워크 데이터 전송할려면 String 형태(serialize)이어야 한다
 	
 	 */
+	//bookVO 객체가 JSON string 으로 serialize 되어 리턴됨
 	@ResponseBody
 	@RequestMapping(value="/createAjax",method=RequestMethod.POST)
 	public BookVO createAjax(@RequestBody BookVO bookVO) {
@@ -96,6 +107,16 @@ public class BookController {
 		int result =this.bookService.createPost(bookVO);
 		log.info("createPost->result : "+result);
 		return bookVO;
+	}
+	@ResponseBody
+	@PostMapping("/createFormData")
+	public int createFormData(BookVO bookVO) {
+		log.info("bookVO:"+bookVO);
+		//도서 등록
+		int result =this.bookService.createPost(bookVO);
+		log.info("createPost->result : "+result);
+		//bookVO에 MultipartFile 타입이 있어서 serialize 되지 못함 => vo 자체 못쓴다
+		return bookVO.getBookId();
 	}
 	/*
     요청URI : /list?keyword=알탄 or /list or /list?keyword=
@@ -107,6 +128,7 @@ public class BookController {
     */
 	@RequestMapping(value="/list",method=RequestMethod.GET)
 	public ModelAndView list(ModelAndView mav,
+			@RequestParam(value="currentPage",required = false, defaultValue = "1") int currentPage,
 			@RequestParam(value = "keyword",required=false,defaultValue = "")  String keyword) {
 //		log.info("list에 왔다");
 		log.info("list -> keyword:" +keyword);
@@ -114,13 +136,17 @@ public class BookController {
 		//map{"keyword":"알탄"}
 		Map<String,Object> map = new HashMap<String, Object>();
 		map.put("keyword", keyword);
+		map.put("currentPage",currentPage);
+		//도서 전체 행수
+		int total=this.bookService.getTotal(map);
+		log.info("list -> total:"+total);
 		
 		
 //		도서목록
 		List<BookVO> bookVOList = this.bookService.list(map);
 //		log.info("list ->bookVOList >>>"+bookVOList);
 //		Model: 데이터
-		mav.addObject("bookVOList", bookVOList);
+		mav.addObject("articlePage", new ArticlePage<BookVO>(total, currentPage, 10, bookVOList, keyword));
 		//View : jsp
 		//forwarding
 		mav.setViewName("book/list");
@@ -133,13 +159,19 @@ public class BookController {
     */
 	@ResponseBody
 	@RequestMapping(value="/listAjax",method=RequestMethod.POST)
-	public List<BookVO> listAjax(@RequestBody Map<String, Object> map) {
+	public ArticlePage listAjax(@RequestBody Map<String, Object> map) {
+		//@RequestBody 있어서 아래 2코드 생략가능
+		//map{"keyword":"알탄","currentPage":1}
+		//map.put("keyword",keyword)
 		
+		int total=this.bookService.getTotal(map);
+		log.info("listAjax -> total:"+total);
 //		도서목록
+		//도서 목록 map{"keyword":"알탄","currentPage":1}
 		List<BookVO> bookVOList = this.bookService.list(map);
 		log.info("listAjax ->bookVOList >>>"+bookVOList);
 		
-		return bookVOList;
+		return new ArticlePage(total, Integer.parseInt(map.get("currentPage").toString()), 10, bookVOList, map.get("keyword").toString());
 	}
 	//책 상세보기
 	   //요청된 URI 주소 : http://localhost/detail?bookId=3
@@ -162,6 +194,18 @@ public class BookController {
 		mav.setViewName("book/detail");
 		
 		return mav;
+	}
+	//비동기 1)@RequestBody로 JSON 받기 2) ResponseBody 로 JSON 보내기
+	@ResponseBody
+	@PostMapping("/datailAjax")
+	public BookVO datailAjax(@RequestBody BookVO bookVO
+			) {
+		bookVO=this.bookService.detail(bookVO);
+		
+		//오라클 Date 자료형의 날짜를 자바 Sting
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		bookVO.setInsertDateStr(formatter.format(bookVO.getInsertDate()));
+		return bookVO;
 	}
 //	@RequestMapping(value="/detail", method=RequestMethod.GET)
 	//              value라는 속성이 하나 -> 생략 가능
@@ -187,15 +231,15 @@ public class BookController {
 	요청파라미터 : {bookId=127, title=개똥이의 모험2, category=소설2, price=12002}
 	요청방식 : post
 	*/
-	@RequestMapping(value = "/updatePost", method = RequestMethod.POST)
-	public ModelAndView updatePost(BookVO bookVO, ModelAndView mav) {
+	@ResponseBody
+	@PostMapping("/updatePost")
+	public BookVO updatePost(@RequestBody BookVO bookVO) {
 		log.info("updatePost-> bookVO:"+bookVO);
 		//insert, update, delete의 return 타입 : int타입
 		int result =this.bookService.updatePost(bookVO);
 		log.info("updatePost ->result"+result);
 		// redirect -> 새로운 URI를 재요청  /detail?bookId=127
-		mav.setViewName( "redirect:/detail?bookId="+bookVO.getBookId());
-		return mav;
+		return bookVO;
 	}
 	/* 
 	요청URI : /updateAjax

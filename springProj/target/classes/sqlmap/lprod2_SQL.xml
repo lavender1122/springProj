@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.LprodMapper">
+	
+	<sql id="where">
+			and (LPROD_ID like
+			'%'||#{keyword}||'%'
+			or LPROD_GU like '%'||#{keyword}||'%'
+			or LPROD_NM like '%'||#{keyword}||'%' )
+	</sql>
+	<!-- LprodVO(lprodId=14, lprodGu=P501, lprodNm=분식류) -->
+	<insert id="createPost" parameterType="lprodVO">
+		insert into lprod(lprod_id,lprod_gu,lprod_nm)
+		values(#{lprodId},#{lprodGu},#{lprodNm})
+	</insert>
+
+	<select id="list" parameterType="hashMap" resultType="lprodVO">
+		WITH U AS(
+		    SELECT ROW_NUMBER() OVER(ORDER BY LPROD_GU DESC) RNUM,T.*
+		    FROM
+		    (
+		    SELECT LPROD_ID, LPROD_GU, LPROD_NM
+		    FROM LPROD
+		    WHERE 1=1
+		    <include refid="where"></include>
+		    )T
+		)
+		SELECT U.*
+		FROM U
+		WHERE U.RNUM BETWEEN ((1*10)-(10-1)) AND (1*10)
+		
+	</select>
+	<!-- LPORD :1  -->
+	<resultMap type="lprodVO" id="lprodMap">
+		<result property="lprodId" column="LPROD_ID"/>
+		<result property="lprodGu" column="LPROD_GU"/>
+		<result property="lprodNm" column="LPROD_NM"/>
+		<collection property="productVOList" resultMap="productMap"></collection>
+	</resultMap>
+	<!-- PRODUCT : N -->
+	<resultMap type="productVO" id="productMap">
+		<result property="productId" column="PRODUCT_ID"/>
+		<result property="pname" column="PNAME"/>
+		<result property="unitPrice" column="UNIT_PRICE"/>
+		<result property="description" column="DESCRIPTION"/>
+		<result property="manufacturer" column="MANUFACTURER"/>
+		<result property="category" column="CATEGORY"/>
+		<result property="unitsInStock" column="UNITS_IN_STOCK"/>
+		<result property="condition" column="CONDITION"/>
+		<result property="filename" column="FILENAME"/>
+		<result property="quantity" column="QUANTITY"/>	
+	</resultMap>
+	
+	<select id="detail" parameterType="lprodVO" resultMap="lprodMap">
+			SELECT A.LPROD_ID, A.LPROD_GU, A.LPROD_NM
+			,B.PRODUCT_ID, B.PNAME, B.UNIT_PRICE, B.DESCRIPTION, B.MANUFACTURER, B.CATEGORY, B.UNITS_IN_STOCK, B.CONDITION, B.FILENAME, B.QUANTITY
+			FROM     LPROD A LEFT OUTER JOIN PRODUCT B ON(A.LPROD_GU=SUBSTR(B.PRODUCT_ID,1,4))
+			WHERE  A.LPROD_GU = #{lprodGu} 
+	</select>
+	<update id="updatePost" parameterType="lprodVO">
+		UPDATE lprod
+		SET
+		LPROD_ID= #{lprodId}
+		, LPROD_NM= #{lprodNm}
+		WHERE
+		lprod_gu = #{lprodGu}
+	</update>
+	<delete id="deletePost" parameterType="lprodVO">
+		DELETE FROM lprod
+		WHERE
+		lprod_gu = #{lprodGu}
+	</delete>
+	<select id="lastLprodId" resultType="int"> 
+		SELECT max(LPROD_ID)+1
+		FROM
+		lprod
+	</select>
+	<insert id="insertProduct" parameterType="productVO">
+	INSERT INTO PRODUCT(PRODUCT_ID, PNAME, UNIT_PRICE)
+	VALUES(#{productId},#{pname},#{unitPrice} )
+	</insert>
+	
+	<!-- //전체 행의 수
+	map:{keyword= 알탄, currentPage=1}
+	public int getTotal(); -->
+	<select id="getTotal" parameterType="hashMap" resultType="int">
+	    	SELECT COUNT(*)
+	    	FROM LPROD
+	    	WHERE 1=1
+	    	<include refid="where"></include>
+	</select>
+</mapper>

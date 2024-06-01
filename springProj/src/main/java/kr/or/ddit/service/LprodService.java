@@ -17,4 +17,8 @@ public interface LprodService {
 
 	public int deletePost(LprodVO lprodVO);
 
+	public int lastLprodId();
+
+	public int getTotal(Map<String, Object> map);
+
 }

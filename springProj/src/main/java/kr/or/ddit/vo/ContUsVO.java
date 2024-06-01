@@ -1,5 +1,7 @@
 package kr.or.ddit.vo;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Data;
 
 // POJO(Plain Old Java Object)가 약해짐 
@@ -10,4 +12,5 @@ public class ContUsVO {
 	private String email;
 	private String subject;
 	private String message;
+	private MultipartFile[] uploadFiles;
 }

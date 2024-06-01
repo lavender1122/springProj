@@ -4,10 +4,64 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script type="text/javascript" src="/resources/js/sweetalert2.min.js"></script>
 <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
 <title>도서 목록</title>
 <script type="text/javascript">
 $(function(){
+	//도서 상세 모달
+	$(".clsBookId").on("click",function(){
+	//<td class="clsBookId" data-book-id="131">1</td>
+// 	console.log("bookId:"+bookId);
+	let bookId= $(this).data("bookId");
+	let data={
+			"bookId":bookId
+	}
+	console.log("data",data);
+	//js세션
+	sessionStorage.setItem("bookId",bookId);
+	//비동기
+	//contentType : 보내는 타입
+	//dataType : 응답 타입
+	$.ajax({
+		url:"/datailAjax",
+		contentType:"application/json;charset=utf-8",
+		data:JSON.stringify(data),
+		type:"post",
+		dataType:"json",
+		beforeSend:function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}","${_csrf.token}");
+		},
+		success:function(result){
+			console.log("result:",result);
+			console.log("result:",result.bookId);
+			
+			let day = new Date(result.insertDate);
+			
+			let year = day.getFullYear();
+			let month = day.getMonth();
+			let date = day.getDate();
+			
+			let allDate = year + "-" + month + "-" + date
+			console.log(allDate)
+			
+			$("#modalBookTitle").html(result.title);
+			$("#modalCategory").val(result.category);
+			$("#modalPrice").val(result.price);
+			$("#modalInsertDate").val(result.insertDateStr);
+			
+			$("#btnCancel").on("click",function(){
+				$("#modalCategory").val(result.category);
+				$("#modalPrice").val(result.price);
+				$("#modalInsertDate").val(result.insertDateStr);
+
+				$(".btnConfirm").css("display","none");
+				$("#btnModify").css("display","block");
+				$(".clsInput").attr("readonly",true);
+			})
+		}
+	})
+	});
 	$("#btnSearch").on("click",function(){
 		let keyword =$("input[name='keyword']").val();
 		
@@ -18,24 +72,81 @@ $(function(){
 		console.log("data:",data)
 		//this => 내가 바로 클릭한것
 // 		$(this).parent().submit();
-		getList(keyword);
+		//새롭게 검색: 1페이지로 초기화
+		getList(keyword,1);
 	});
 	
 	$("#btnSearchAll").on("click",function(){
-		getList("");
+		//새롭게 검색: 1페이지로 초기화
+		getList("",1);
 	});
 	
 	//목록 함수 호출
-	getList("");
-});
+// 	getList("");
+	$("#btnModify").on("click",function(){
+		
+		$(".btnConfirm").css("display","block");
+		$("#btnModify").css("display","none");
+		$(".clsInput").attr("readonly",false);
+	});//#btnModify end
+	
+	$("#btnOk").on("click",function(){
+		
+		let modalCategory =$("#modalCategory").val();
+		let modalPrice = $("#modalPrice").val();
+		let modalInsertDate = $("#modalInsertDate").val();
+// 		console.log(modalCategory+","+modalPrice+","+modalInsertDate);
+
+		let data ={
+				"bookId":sessionStorage.getItem("bookId"),
+				"category":modalCategory,
+				"price":modalPrice,
+				"insertDate	":modalInsertDate
+		}
+		console.log("data>>",data);
+		$.ajax({
+			url:"/updatePost",
+			contentType:"application/json;charset=utf-8",
+			data:JSON.stringify(data),
+			type:"post",
+			dataType:"json",
+			beforeSend:function(xhr){
+				xhr.setRequestHeader("${_csrf.headerName}","${_csrf.token}");
+			},
+			success:function(result){
+				console.log("result>>",result);
+				
+				
+				var Toast = Swal.mixin({
+					toast:true,
+					position:"top-end",
+					showConfirmButton:false,
+					timer:3000
+				});
+				Toast.fire({
+					icon:"success",
+					title:"등록되었습니다."
+				})
+				
+				//list 비동기로 새로 고침
+				getList("",1);
+				//모달 닫기
+// 				$("#modalBook").modal("hide");
+			}
+		})
+		
+	})
+
+});//$function end
 //목록
-function getList(keyword){
+function getList(keyword,currentPage){
 	//json오브젝트
 	let data= {
-			"keyword":keyword
+			"keyword":keyword,
+			"currentPage":currentPage
 	}
 	
-	//data:{"keyword":""}
+	//data:{"keyword":"알탄","currentPage":"1"}
 	//아작나써유.. (피)씨다터써..
 	$.ajax({
 		url:"/listAjax",
@@ -46,7 +157,8 @@ function getList(keyword){
 		//응답영역
 		dataType:"json",
 		success:function(result){
-			//result:List<BookVO>		
+			//result:articlePage
+			//result.content:List<Book>
 			console.log("result",result);
 			
 			let str="";
@@ -59,6 +171,7 @@ function getList(keyword){
 			str +="<td>"+bookVO.price+"원</td>";
 			str +="</tr>";
 			});
+			$(".clsPagingArea").html(result.pagingArea)
 			$("#trShow").html(str);
 		}
 	})
@@ -107,15 +220,52 @@ function getList(keyword){
        <!-- bookVOList => List<BookVO> -->
        <!-- row : bookVO 1행 -->
        <!--  -->
-<%--        <c:forEach var="bookVO" items="${bookVOList}"  varStatus="stat"> --%>
-<!-- 		<tr> -->
-<%-- 			<td>${stat.count}</td> --%>
-<%-- 			<td><a href="/detail?bookId=${bookVO.bookId}"> ${bookVO.title}</a></td> --%>
-<%-- 			<td>${bookVO.category}</td> --%>
-<%-- 			<td><fmt:formatNumber value="${bookVO.price}" pattern="#,###"/> --%>
-<!-- 		</tr> -->
-<%--        </c:forEach> --%>
+       <c:forEach var="bookVO" items="${articlePage.content}"  varStatus="stat">
+		<tr>
+			<td class="clsBookId" data-toggle="modal" data-target="#modalBook"
+			 data-book-id="${bookVO.bookId}">${bookVO.rnum}</td>
+			<td><a href="/detail?bookId=${bookVO.bookId}"> ${bookVO.title}</a></td>
+			<td>${bookVO.category}</td>
+			<td><fmt:formatNumber value="${bookVO.price}" pattern="#,###"/>
+		</tr>
+       </c:forEach>
 	</tbody>
 </table>
+<hr/>
+<div class="row clsPagingArea">
+	${articlePage.pagingArea}
+<!-- test 시작 -->
+           
+<!-- test 끝 -->           
+</div>
+<div class="modal fade" id="modalBook">
+       <div class="modal-dialog modal-lg">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h4 class="modal-title" id="modalBookTitle"></h4>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+             </button>
+           </div>
+           <div class="modal-body" id="modalBookBody">
+           <input type="hidden" value="${bookVO}">
+			 카테고리 : <input type="text" class="form-control clsInput" id="modalCategory" readonly/><br> 
+			 가&nbsp;&nbsp;&nbsp;격 : <input type="text" class="form-control clsInput" id="modalPrice"readonly/><br> 
+			 등&nbsp;록&nbsp;일 : <input type="text" class="form-control clsInput" id="modalInsertDate"readonly/><br> 
+			          
+           </div>
+           <div class="modal-footer justify-content-between">
+             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+             <button type="button" class="btn btn-primary btnEdit float-right" id="btnModify" >수정</button>
+             <button type="button" class="btn btn-success btnConfirm" style="display:none;" id="btnOk">확인</button>
+             <button type="button" class="btn btn-warning btnConfirm" style="display:none;" id="btnCancel">취소</button>
+           </div>
+         </div>
+         <!-- /.modal-content -->
+   </div>
+   <!-- /.modal-dialog -->
+ </div>
+ <!-- /.modal -->
+ <hr/>
 </body>
 </html>

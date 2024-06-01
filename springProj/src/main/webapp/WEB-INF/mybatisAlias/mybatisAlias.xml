@@ -19,6 +19,21 @@
    	<typeAlias type="kr.or.ddit.vo.ProjectAddVO" alias="ProjectAddVO"/>
    	<typeAlias type="kr.or.ddit.vo.CustomerVO" alias="customerVO"/>
    	<typeAlias type="kr.or.ddit.vo.ContUsVO" alias="contUsVO"/>
+   	<typeAlias type="kr.or.ddit.vo.MemberVO" alias="memberVO"/>
+   	<typeAlias type="kr.or.ddit.vo.Address" alias="address"/>
+   	<typeAlias type="kr.or.ddit.vo.Card" alias="card"/>
+   	<typeAlias type="kr.or.ddit.vo.ProfileVO" alias="profileVO"/>
+   	<typeAlias type="kr.or.ddit.vo.Activity" alias="activity"/>
+   	<typeAlias type="kr.or.ddit.vo.ProductVO" alias="productVO"/>
+   	<typeAlias type="kr.or.ddit.vo.License" alias="license"/>
+   	<typeAlias type="kr.or.ddit.vo.AttachVO" alias="attachVO"/>
+   	<typeAlias type="kr.or.ddit.vo.Setting" alias="setting"/>
+   	<typeAlias type="kr.or.ddit.vo.ComCodeVO" alias="comCodeVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ComCodeDetailVO" alias="comCodeDetailVO"/>
+   	<typeAlias type="kr.or.ddit.vo.EmployeeAuthVO" alias="employeeAuthVO"/>
+   	<typeAlias type="kr.or.ddit.vo.MemberAuthVO" alias="memberAuthVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ComCodeInfoVO" alias="comCodeInfoVO"/>
+   	<typeAlias type="kr.or.ddit.vo.ComDetCodeInfoVO" alias="comDetCodeInfoVO"/>
    </typeAliases>
 </configuration>
 

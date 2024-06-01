@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="attach">
+	<insert id="insertAttach" parameterType="attachVO">
+	INSERT INTO ATTACH(GLOBAL_CODE, SEQ, FILENAME, FILE_SIZE, CONTENT_TYPE, REG_DATE)
+	VALUES(#{globalCode},#{seq},#{filename},#{fileSize},#{contentType},SYSDATE)		
+	</insert>
+	<select id="getFileName" parameterType="String" resultType="attachVO">
+	<!-- 상관관계 서브쿼리 : main 쿼리의 특정 컬럼의 기본키 데이터가 sub쿼리의 조건으로 사용되고 sub쿼리의 select 결과
+		 다시 main쿼리의 조건으로 서로 사용됨 -->
+		SELECT
+		    A.global_code,
+		    A.seq,
+		    A.filename,
+		    A.file_size,
+		    A.content_type,
+		    A.reg_date
+		FROM
+		    attach A
+		WHERE    
+		    A.global_code=#{globalCode}
+		    AND A.SEQ=(
+		        SELECT MIN(B.SEQ)
+		        FROM ATTACH B
+		        WHERE B.GLOBAL_CODE=A.GLOBAL_CODE
+		    )	
+	</select>
+</mapper>

@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import kr.or.ddit.service.ContUsService;
@@ -37,17 +39,29 @@ public class ContUsController {
 	@RequestMapping(value = "/createPost", method=RequestMethod.POST)
 	public ModelAndView createPost(ContUsVO contUsVO
 			,ModelAndView mav) {
+		log.info("이쪽으로 와야된다!");
 //		log.info("createPost contUsVO ->"+contUsVO);
 		
 		//CONT_US 테이블 insert
 		
 		int result = this.contUsService.createPost(contUsVO);
-//		log.info("createPost result"+result);
+		log.info("createPost result"+result);
 		
 		//목록 이동: 새로운 URI 요청
 		mav.setViewName("redirect:/contUs/list");
 		return mav;
 		
+	}
+	@ResponseBody
+	@PostMapping("/createFormData")
+	public String createFormData(ContUsVO contUsVO) {
+		
+		log.info("createFormData ContUsVO"+contUsVO);
+		
+		int result = this.contUsService.createPost(contUsVO);
+		log.info("createFormData result"+result);
+		
+		return "SCCUESS";
 	}
 	/*
 	   요청URI : /contUs/list

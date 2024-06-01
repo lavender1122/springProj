@@ -1,14 +1,24 @@
 package kr.or.ddit.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import kr.or.ddit.dao.BookDao;
 import kr.or.ddit.service.BookService;
+import kr.or.ddit.service.dao.AttachDao;
+import kr.or.ddit.utils.UploadController;
+import kr.or.ddit.vo.AttachVO;
 import kr.or.ddit.vo.BookVO;
+import lombok.extern.slf4j.Slf4j;
 
 //서비스 클래스 : 비즈니스 로직
 //스프링 MVC 구조에서 Controller와 DAO를 연결하는 역할
@@ -21,6 +31,7 @@ import kr.or.ddit.vo.BookVO;
 Impl : implement의 약자 
 */
 //"프링아 이 클래스 서비스 클래야"라고 알려주자. 프링이가 자바빈으로 등록해줌.
+@Slf4j
 @Service
 public class BookServiceImpl implements BookService {
 	//데이터베이스 접근을 위해 BookDao 인스턴스를 주입받자
@@ -28,10 +39,69 @@ public class BookServiceImpl implements BookService {
 	   //IoC(Inversion of Control):제어의 역전
 	@Autowired
 	BookDao bookDao;
+	@Autowired
+	String uploadFolder;
+	@Autowired
+	AttachDao attachDao;
+	@Autowired
+	UploadController uploadController;
+	
 	//매서드 재정의
 	@Override
 	public int createPost(BookVO bookVO) {
-		return this.bookDao.createPost(bookVO);
+		//1) BOOK 테이블에 insert
+		int result =  this.bookDao.createPost(bookVO);
+		//2)파일업로드
+			//연월일 폴더 처리 시작
+		File uploadPath = new File(this.uploadFolder, uploadController.getFolder());
+		if(uploadPath.exists()==false) {
+			uploadPath.mkdirs(); // 파일생성
+		}
+		//스프링 파일 객체 타입의 배열로 부터 파일 객체를 하나씩 거내기
+		MultipartFile[] pictures = bookVO.getPictures();
+		
+		String uploadFileName="";//업로드용
+		String fileName="";//DB용
+		int seq=1;
+		for(MultipartFile multipartFile:pictures) {
+			log.info("----------------------------");
+			log.info("파일명: "+multipartFile.getOriginalFilename());
+			log.info("파일크리: "+ multipartFile.getSize());
+			log.info("MIME:"+ multipartFile.getContentType());
+			log.info("----------------------------");
+			uploadFileName = multipartFile.getOriginalFilename();
+			
+			//UUID
+			UUID uuid = UUID.randomUUID();
+			uploadFileName = uuid.toString()+"_"+ uploadFileName;
+			
+			File saveFile = new File(uploadPath, uploadFileName);
+			try {
+				multipartFile.transferTo(saveFile);
+				fileName ="/"+uploadController.getFolder().replace("\\", "/")+uploadFileName;
+				
+				AttachVO attachVO = new AttachVO();
+				attachVO.setGlobalCode(bookVO.getBookId()+"");
+				attachVO.setSeq(seq++);
+				attachVO.setFilename(fileName);
+				attachVO.setFileSize(multipartFile.getSize());
+				attachVO.setContentType(multipartFile.getContentType());
+				attachVO.setRegDate(null);
+				log.info("attachVO"+attachVO);
+				
+				result  += this.attachDao.insertAttach(attachVO);
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+			//연월일 폴더 처리 끝
+		//3) ATTACH 테이블에 insert
+		return result;
 	}
 	@Override
 	public List<BookVO> list(Map<String, Object> map) {
@@ -49,6 +119,10 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public int deletePost(BookVO bookVO) {
 		return this.bookDao.deletePost(bookVO);
+	}
+	@Override
+	public int getTotal(Map<String, Object> map) {
+		return this.bookDao.getTotal(map);
 	}
 
 }

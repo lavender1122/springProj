@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.MemberMapper">
+	
+	<resultMap type="memberVO" id="memberMap">
+		<result property="userId" column="USER_ID"/>
+		<result property="userName" column="USER_NAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="regDate" column="REG_DATE"/>
+		<result property="coin" column="COIN"/>
+		<result property="enabled" column="ENABLED"/>
+		<collection property="memberAuthVOList" resultMap="memberAuthMap"></collection>
+	</resultMap>
+	<resultMap type="memberAuthVO" id="memberAuthMap">
+		<result property="userId" column="USER_ID"/>
+		<result property="auth" column="AUTH"/>	
+	</resultMap>
+
+
+
+	<!-- 부모(MEMBER)1 : 자식(MEMBER_AUTH) N -->
+	<select id="detail" parameterType="String" resultMap="memberMap" >
+		SELECT A.USER_ID, A.USER_NAME, A.PASSWORD, A.REG_DATE, A.COIN, A.ENABLED
+		          , B.AUTH
+		FROM MEMBER A, MEMBER_AUTH B
+		WHERE A.USER_ID =B.USER_ID
+		AND A.USER_ID=#{username}	
+	</select>
+</mapper>

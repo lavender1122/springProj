@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="profile">
+	<select id="profileInfo" parameterType="String" resultType="profileVO">
+	SELECT
+	    USER_NAME,
+	    PROFILE_USER_IMG,
+	    INTRODUCTION,
+	    EDUCATION,
+	    LOCATION,
+	    SKILLS,
+	    NOTES,
+	    USER_ID
+	FROM
+	    PROFILE1
+	WHERE
+	    USER_ID =#{userId}	
+	</select>
+	<select id="activityAjax" parameterType="String" resultType="activity">
+	SELECT
+	    user_id,
+	    post_id,
+	    post_type,
+	    post_date,
+	    activity_comment
+	FROM
+	    activity
+	where
+	    user_id= #{userId}
+	ORDER BY post_date desc	
+	</select>
+	<insert id="settingCreateAjax" parameterType="setting">
+	<selectKey resultType="int" order="BEFORE" keyProperty="seq">
+      SELECT NVL(MAX(SEQ),0)+1 FROM SETTING
+   </selectKey>
+		INSERT INTO SETTING(SEQ, USER_ID, TYPE)
+		VALUES(#{seq},#{userId},#{type})	
+	</insert>
+	<update id="profileUpdateAjax" parameterType="profileVO">
+		UPDATE profile1
+		SET
+		    USER_NAME =#{userName}
+		    , PROFILE_USER_IMG=#{profileUserImg}
+		    , INTRODUCTION=#{introduction}
+		    , EDUCATION=#{education}
+		    , LOCATION=#{location}
+		    , NOTES=#{notes}
+		WHERE
+		    USER_ID=#{userId}	
+	</update>
+</mapper>

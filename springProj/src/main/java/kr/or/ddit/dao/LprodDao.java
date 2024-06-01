@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import kr.or.ddit.vo.LprodVO;
+import kr.or.ddit.vo.ProductVO;
 import lombok.extern.slf4j.Slf4j;
 //매퍼xml(lprod_SQL.xml)을 실행시키는 
 //DAO(Data Access Object) 클래스
@@ -29,9 +30,9 @@ public class LprodDao {
     //lprodVO=>{lprodId=14, lprodGu=P501, lprodNm=분식류}
     //insert,update,delete는 반영된 건수가 return됨
     //insert성공 : 1이상, 실패면 0
-	public int createPost(LprodVO lprodVO) {
-		return this.sqlSessionTemplate.insert("lprod.createPost", lprodVO);
-	}
+//	public int createPost(LprodVO lprodVO) {
+//		return this.sqlSessionTemplate.insert("lprod.createPost", lprodVO);
+//	}
 	
 	public List<LprodVO> list(Map<String, Object> map) {
 		log.info("dao->list");
@@ -49,6 +50,19 @@ public class LprodDao {
 
 	public int deletePost(LprodVO lprodVO) {
 		return this.sqlSessionTemplate.delete("lprod.deletePost", lprodVO);
+	}
+
+	public int lastLprodId() {
+		return this.sqlSessionTemplate.selectOne("lprod.lastLprodId");
+	}
+	
+	//PRODUCT 테이블에 insert
+	public int insertProduct(ProductVO productVO) {
+		return this.sqlSessionTemplate.insert("lprod.insertProduct",productVO);
+	}
+
+	public int createPost(LprodVO lprodVO) {
+		return this.sqlSessionTemplate.insert("lprod.createPost", lprodVO);
 	}
 
 }

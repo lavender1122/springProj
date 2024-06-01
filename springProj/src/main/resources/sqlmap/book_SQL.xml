@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="book">
+
    <!-- MyBatis에서 제공해주는 데이터 입력을 나타내는 태그
    1) 드루와 : Dao 객체가 던진 데이터타입.parameterType만 씀
    2) 가즈아 : Dao 객체의 메소드 쪽으로 리턴할 타입.
@@ -44,23 +45,22 @@
       keyword : ""  (/list?keyword=)
     -->
    <!-- hashMap => map 클래스 -->
+   <!-- keyword : "알탄" (/list?keyword=알탄&currentPage=1)
+   		keyword : "" (/list?keyword=알탄&currentPage=1)
+    -->
    <select id="list" parameterType="hashMap" resultType="bookVO">
-		SELECT
-	    book_id,
-	    title,
-	    category,
-	    price,
-	    insert_date
-	FROM
-	    book
-	 WHERE 1=1
-	 <if test ="keyword!=null and keyword!=''" >
-	and (title    like '%'||#{keyword}||'%'
-	  or category like '%'||#{keyword}||'%'
-	  or price    like '%'||#{keyword}||'%' )
-	</if>
-	order by book_id desc
+		SELECT T.*
+		FROM
+		(
+			SELECT ROW_NUMBER() OVER(ORDER BY BOOK_ID DESC) RNUM
+			        ,BOOK_ID, TITLE, CATEGORY, PRICE, INSERT_DATE
+			FROM   BOOK
+			WHERE  1 = 1
+<!-- 			<include refid="where"></include> -->
+		) T
+		WHERE T.RNUM BETWEEN ((#{currentPage}*10)-(10-1)) AND (#{currentPage}*10)
 	</select>
+	
 	<!-- parameterMap 사용암함!! 
 	resultMap은 JOIN 도는 CLOB 자료형에서 주로 사용함
 	-->
@@ -72,8 +72,10 @@
 	<update id="updatePost" parameterType="bookVO">
 	UPDATE book
 	SET 
-	TITLE=#{title}
-	, CATEGORY=#{category}
+	<if test="title!=null and title!=''">
+	TITLE=#{title},
+	</if>
+	 CATEGORY=#{category}
 	, PRICE=#{price}
 	WHERE
    book_id = #{bookId}
@@ -82,4 +84,11 @@
 		delete from book 
 		where book_id = #{bookId}
 	</delete>
+	<!-- 도서 전체 행수 -->
+	<select id="getTotal" parameterType="hashMap" resultType="int">
+		SELECT COUNT(*)
+		FROM BOOK
+		WHERE 1=1
+<!-- 		<include refid="where"></include> -->
+	</select>
 </mapper>

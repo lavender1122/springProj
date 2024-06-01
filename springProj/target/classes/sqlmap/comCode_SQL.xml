@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ComCodeMapper">
+	<!--
+			//국적을 공통코드로부터 가져오기
+			ComCodeVO getComCode(String comCode);
+	  -->
+	  <!-- COM_CODE (1) 부모 -->
+	  <resultMap type="comCodeVO" id="comCodeMap">
+		<result property="comCode" column="COM_CODE"/>
+		<result property="comCodeNm" column="COM_CODE_NM"/>
+		<collection property="comCodeDetailVOList" resultMap="comCodeDetailMap"></collection>
+	  </resultMap>
+	  <!-- COM_CODE_DETAIL(N) 자식  -->
+	  <resultMap type="comCodeDetailVO" id="comCodeDetailMap">
+		<result property="comCodeDetail" column="COM_CODE_DETAIL"/>
+		<result property="comCodeDetailNm" column="COM_CODE_DETAIL_NM"/>
+		<result property="comCode" column="COM_CODE"/>	  
+	  </resultMap>
+	  <select id="getComCode" parameterType="String" resultMap="comCodeMap">
+		SELECT A.COM_CODE, A.COM_CODE_NM
+		            ,  B.COM_CODE_DETAIL, B.COM_CODE_DETAIL_NM, B.COM_CODE
+		FROM     COM_CODE A, COM_CODE_DETAIL B
+		WHERE  A.COM_CODE = B.COM_CODE
+		AND       A.COM_CODE = #{comCode}
+		ORDER BY B.COM_CODE_DETAIL	  	
+	  </select>
+</mapper>

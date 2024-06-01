@@ -1,6 +1,10 @@
 package kr.or.ddit.vo;
 
 import java.util.Date;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;
 
@@ -9,9 +13,14 @@ import lombok.Data;
 //@Data=> PoJo(Plain순수한 old Java object)에 위배
 @Data
 public class BookVO {
+	private int      rnum;
 	private int      bookId;
 	private String   title;
 	private String 	 category;
 	private int 	 price;
+	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private Date	 insertDate;
+	private String   insertDateStr;
+	//BOOK: ATTACH = 1:N
+	private MultipartFile[] pictures;
 }

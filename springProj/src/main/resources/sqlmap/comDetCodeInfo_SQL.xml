@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mapper.ComDetCodeInfoMapper">
+	<!-- 입력 뷰 -->
+	<select id="create" resultType="comDetCodeInfoVO">
+	SELECT COM_DET_CODE, COM_CODE, COM_DET_CODE_NM, DESCRIPTIONS
+		FROM COM_DET_CODE_INFO	
+	</select>
+	
+	<!-- 입력 실행 -->
+	<insert id="createPost" parameterType="comDetCodeInfoVO">
+	INSERT INTO COM_DET_CODE_INFO (COM_DET_CODE, COM_CODE, COM_DET_CODE_NM
+	<if test="descriptions!=null and descriptions !=''">
+	, DESCRIPTIONS
+	</if>
+	)
+	VALUES(#{comDetCode},#{comCode},#{comDetCodeNm}
+	<if test="descriptions!=null and descriptions !=''">
+	, #{descriptions}
+	</if>
+	)
+	</insert>
+	<!-- 상세 뷰 -->
+	<select id="detail" parameterType="comDetCodeInfoVO" resultType="comDetCodeInfoVO">
+		SELECT COM_DET_CODE, COM_CODE, COM_DET_CODE_NM, DESCRIPTIONS
+		FROM COM_DET_CODE_INFO
+		WHERE COM_DET_CODE= #{comDetCode}
+	</select>
+	<!-- 수정 실행 -->
+	<update id="updatePost" parameterType="comDetCodeInfoVO">
+		UPDATE COM_DET_CODE_INFO
+		SET
+		COM_DET_CODE_NM = #{comDetCodeNm}
+		<if test="descriptions!=null and descriptions !=''">
+		, DESCRIPTIONS = #{descriptions}
+		</if>
+		WHERE
+		COM_DET_CODE = #{comDetCode}	
+	</update>
+	
+	<delete id="deletePost" parameterType="comDetCodeInfoVO">
+		DELETE FROM COM_DET_CODE_INFO
+		WHERE COM_DET_CODE= #{comDetCode}	
+	</delete>
+	
+	<select id="list"  parameterType="hashMap" resultType="comDetCodeInfoVO">
+		SELECT COM_DET_CODE, COM_CODE, COM_DET_CODE_NM, DESCRIPTIONS
+		FROM COM_DET_CODE_INFO	
+	</select>
+	
+	<!--comDetCodeInfoVO{...,comcode=HBY01,..}  -->
+	<select id="getNextComCode" parameterType="comDetCodeInfoVO" resultType="String">
+		SELECT NVL(SUBSTR(MAX(COM_DET_CODE),1,5)
+		          || TRIM(TO_CHAR(SUBSTR(MAX(COM_DET_CODE),6)+1,'000')),#{comCode}||'001')
+		FROM COM_DET_CODE_INFO
+		WHERE COM_CODE=#{comCode}
+	</select>
+</mapper>

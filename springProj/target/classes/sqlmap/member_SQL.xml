@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+
+	<!-- I/U/D resultType 생략 why? 당연히 int 라서 -->
+	<insert id="registerUserId" parameterType="memberVO">
+		INSERT INTO member
+		(USER_ID, USER_NAME, PASSWORD, REG_DATE, COIN)
+		VALUES
+		(#{userId},#{userName},#{password},SYSDATE,#{coin})
+	</insert>
+	
+	<insert id="insertAddress" parameterType="address">
+		INSERT INTO
+		ADDRESS(USER_ID, POST_CODE, LOCATION)
+		VALUES(#{userId},#{postCode},#{location})
+	</insert>
+	<!-- CARD 테이블에 INSERT
+   Card{userId=c001,no=111,validMonth=24/03}
+    -->
+	<insert id="insertCard" parameterType="card">
+		INSERT INTO CARD(USER_ID, NO, VALID_MONTH)
+		VALUES(#{userId},#{no},#{validMonth})
+	</insert>
+	
+	<!-- member 1 -->
+	<resultMap type="memberVO" id="read01Map">
+		<result property="userId" column="USER_ID"/>
+		<result property="userName" column="USER_NAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="regDate" column="REG_DATE"/>
+		<result property="coin" column="COIN"/>	
+		<collection property="cardList" resultMap="cardListMap"></collection>
+	</resultMap>
+	<resultMap type="card" id="cardListMap">
+		<result property="userId" column="USER_ID"/>
+		<result property="no" column="NO"/>
+		<result property="validMonth" column="VALID_MONTH"/>	
+	</resultMap>
+	<select id="read01" parameterType="String" resultMap="read01Map">
+		SELECT A.USER_ID, A.USER_NAME, A.PASSWORD, A.REG_DATE, A.COIN
+				,B.NO, B.VALID_MONTH
+		FROM MEMBER A LEFT OUTER JOIN CARD B
+		ON( A.USER_ID =B.USER_ID)
+		WHERE A.USER_ID=#{userId}
+	</select>
+</mapper>

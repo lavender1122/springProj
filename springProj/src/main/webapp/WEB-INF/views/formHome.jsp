@@ -42,8 +42,9 @@ method="get"이 생략됨
 요청방식 : post
 -->
 <form action="/registerUserId" method="post">
-	<p>userId:<input type="text" name ="userId" value="hongkd"/></p>
-	<p>passwoad:<input type="passwoad" name ="password" value="1234"/></p>
+	<p>userId:<input type="text" name ="userId" value="" required/></p>
+	<p>userName:<input type="text" name ="userName" value=""required/></p>
+	<p>passwoad:<input type="passwoad" name ="password" value="1234"required/></p>
 	<p>coin :<input type="text" name ="coin" value="100"/></p>
 	<p>regist Date : <input type="date" name="regDate" value=""></p>
 	<p>gender : <br/>
@@ -154,6 +155,15 @@ method="get"이 생략됨
    	<br/>
    	location :<input type="text" name="address.location">
    </p>
+   <p>
+      <input type="text" name="cardList[0].no" placeholder="카드1-번호"> <br>
+      <input type="text" name="cardList[0].validMonth" placeholder="카드1-유효연월"> <br>
+      <input type="text" name="cardList[1].no" placeholder="카드2-번호"> <br>
+      <input type="text" name="cardList[1].validMonth" placeholder="카드2-유효연월"> <br>
+   </p>
+   <p>
+      <textarea name="introduction" cols="50" rows="60" placeholder="자기소개"></textarea>
+   </p>
 	<p><input type="submit" value="register01"/></p>
 </form>
 <hr/>
@@ -180,5 +190,5 @@ function getToday(){
 	let obj =document.querySelector("input[name='regDate']")
 	obj.value=dateString
 }
-getToday();
+getToday(); 
 </script>

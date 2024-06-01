@@ -1,49 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="employee">
+	<sql id="where">
+		<if test ="keyword!=null and keyword!=''">
+		    and (emp_no    like '%'||#{keyword}||'%'
+		  or emp_name like '%'||#{keyword}||'%'
+		  or emp_address like '%'||#{keyword}||'%'
+		  or emp_telno like '%'||#{keyword}||'%'
+		  or filename    like '%'||#{keyword}||'%' )
+		    </if>
+	</sql>
 	<insert id="createPost" parameterType="employeeVO">
-	INSERT INTO employee (
-    emp_no,
-    emp_name,
-    emp_address,
-    emp_telno,
-    emp_salary,
-    filename
-	) VALUES (#{empNo},#{empName},#{empAddress},#{empTelno},#{empSalary},#{filename})
-	</insert>
-	<select id="list" parameterType="employeeVO" resultType="employeeVO">
-		SELECT
+		INSERT INTO employee (
 	    emp_no,
 	    emp_name,
 	    emp_address,
 	    emp_telno,
-	    emp_salary,
-	    filename
-	FROM
-	    employee
-	WHERE
-		1=1
-	    <if test ="keyword!=null and keyword!=''">
-	    and (emp_no    like '%'||#{keyword}||'%'
-	  or emp_name like '%'||#{keyword}||'%'
-	  or emp_address like '%'||#{keyword}||'%'
-	  or emp_telno like '%'||#{keyword}||'%'
-	  or filename    like '%'||#{keyword}||'%' )
+	    emp_salary
+	    <if test="filename!=null and filename!=''">
+	    ,filename
 	    </if>
-	   ORDER BY emp_no
-	</select>
-	<select id="detail" parameterType="employeeVO" resultType="employeeVO">
-			SELECT
-		    emp_no,
-		    emp_name,
-		    emp_address,
-		    emp_telno,
-		    emp_salary,
-		    filename
+	    
+		) VALUES (#{empNo},#{empName},#{empAddress},#{empTelno},#{empSalary}
+		<if test="filename!=null and filename!=''">
+		,#{filename}
+		</if>
+		)
+	</insert>
+	<select id="list" parameterType="employeeVO" resultType="employeeVO">
+		SELECT T.*
 		FROM
-		    employee
-		where
-			emp_no=#{empNo}
+		(
+		SELECT ROW_NUMBER() OVER(ORDER BY EMP_NO) RNUM
+		    ,EMP_NO, EMP_NAME, EMP_ADDRESS, EMP_TELNO, EMP_SALARY, FILENAME
+		    FROM EMPLOYEE
+		    WHERE 1=1
+			<include refid="where"></include>
+		)T
+		WHERE T.RNUM BETWEEN ((#{currentPage}*10)-(10-1)) AND (#{currentPage}*10)
+	</select>
+	<!-- 조인 조건 P.K = F.K 이므로 F.K는 쿼리에서 제외 -->
+	<!-- EMPLOYEE : 1 -->
+	<resultMap type="employeeVO" id="employeeMap">
+		<result property="empNo" column="EMP_NO"/>
+		<result property="empName" column="EMP_NAME"/>
+		<result property="empAddress" column="EMP_ADDRESS"/>
+		<result property="empTelno" column="EMP_TELNO"/>
+		<result property="empSalary" column="EMP_SALARY"/>
+		<result property="filename" column="FILENAME"/>	
+		<collection property="licenseList" resultMap="licenseMap"></collection>
+	</resultMap>
+	<!-- LICENSE : N -->
+	<resultMap type="license" id="licenseMap">
+		<result property="empNo" column="EMP_NO"/>
+		<result property="licNo" column="LIC_NO"/>
+		<result property="licNm" column="LIC_NM"/>
+		<result property="licDt" column="LIC_DT"/>	
+	</resultMap>
+	
+	<select id="detail" parameterType="employeeVO" resultMap="employeeMap">
+		SELECT A.EMP_NO, A.EMP_NAME, A.EMP_ADDRESS, A.EMP_TELNO, A.EMP_SALARY, A.FILENAME
+		            ,  B.EMP_NO, B.LIC_NO, B.LIC_NM, B.LIC_DT
+		FROM     EMPLOYEE A LEFT OUTER JOIN LICENSE B
+		ON(A.EMP_NO = B.EMP_NO)
+		WHERE A.EMP_NO=#{empNo}
 	</select>
 	<update id="updatePost" parameterType="employeeVO">
 		UPDATE employee
@@ -61,4 +81,19 @@
 		WHERE
 		        emp_no =#{empNo}		
 	</delete>
+	<insert id="insertLicense" parameterType="license">
+	INSERT INTO LICENSE(EMP_NO,LIC_NO, LIC_NM, LIC_DT)
+	VALUES(#{empNo},#{licNo},#{licNm},#{licDt})
+	</insert>
+	<update id="updateFileName" parameterType="attachVO">
+		UPDATE EMPLOYEE
+		SET FILENAME= #{filename}
+		WHERE EMP_NO= #{globalCode}			
+	</update>
+	<select id="getTotal" parameterType="hashMap" resultType="int">
+		SELECT COUNT(*)
+		FROM EMPLOYEE
+		WHERE 1=1
+		<include refid="where"></include>		
+	</select>
 </mapper>

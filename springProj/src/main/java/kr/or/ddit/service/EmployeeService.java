@@ -15,4 +15,6 @@ public interface EmployeeService {
 	public int updatePost(EmployeeVO employeeVO);
 
 	public int deletePost(EmployeeVO employeeVO);
+
+	public int getTotal(Map<String, Object> map);
 }

@@ -43,4 +43,9 @@ public class BookDao {
 	public int deletePost(BookVO bookVO) {
 		return this.sqlSessionTemplate.delete("book.deletePost", bookVO);
 	}
+	
+	//도서 전체 행수
+	public int getTotal(Map<String, Object> map) {
+		return this.sqlSessionTemplate.selectOne("book.getTotal", map);
+	}
 }
