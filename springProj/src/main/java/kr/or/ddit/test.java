@@ -1,5 +1,6 @@
 package kr.or.ddit;
 
 public class test {
-	void test;
+	String test;
+	String test1;
 }
